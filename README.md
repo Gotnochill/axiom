@@ -1,10 +1,10 @@
-# ◎ Axiom — Hyper-Local Civic Intelligence Platform
+# Axiom — Hyper-Local Civic Intelligence Platform
 
 A geo-fencing web application that brings transparency to public infrastructure development. Admins mark development sites on a live map with geo-fence zones, and civilians receive real-time proximity notifications when they are near active projects.
 
 ---
 
-## 🚀 Quick Start — Run Locally
+## Quick Start — Run Locally
 
 ### Prerequisites
 
@@ -27,7 +27,7 @@ npm start
 The server will start at:
 
 ```
-⚡ http://localhost:3000
+http://localhost:3000
 ```
 
 ### What You'll See
@@ -42,7 +42,7 @@ The server will start at:
 
 ---
 
-## 🌐 Deploy Online
+## Deploy Online
 
 This app is a standalone Node.js server and can be deployed on any platform that supports Node (Render, Railway, Fly.io, etc.).
 
@@ -56,29 +56,29 @@ This app is a standalone Node.js server and can be deployed on any platform that
 
 ---
 
-## 📖 How It Works
+## How It Works
 
 ### System Overview
 
 ```
-┌──────────────┐         REST API          ┌──────────────┐
-│              │  ◄───────────────────────► │              │
-│  Admin UI    │   POST/PUT/DELETE /sites   │   Express    │
-│  (Leaflet)   │                            │   Server     │
-│              │                            │              │
-└──────────────┘                            │  In-memory   │
-                                            │  data store  │
-┌──────────────┐         REST API          │              │
-│              │  ◄───────────────────────► │              │
-│ Civilian UI  │     GET /api/sites         └──────────────┘
-│ (Leaflet +   │
-│  Geolocation)│
-└──────────────┘
++----------------+         REST API          +----------------+
+|                |  <----------------------> |                |
+|  Admin UI      |   POST/PUT/DELETE /sites  |   Express      |
+|  (Leaflet)     |                           |   Server       |
+|                |                           |                |
++----------------+                           |  In-memory     |
+                                             |  data store    |
++----------------+         REST API          |                |
+|                |  <----------------------> |                |
+| Civilian UI    |     GET /api/sites        +----------------+
+| (Leaflet +     |
+|  Geolocation)  |
++----------------+
 ```
 
 ### The Two Roles
 
-#### 🛠 Administrator
+#### Administrator
 
 The admin dashboard provides a full-screen interactive map with a sidebar control panel.
 
@@ -91,7 +91,7 @@ The admin dashboard provides a full-screen interactive map with a sidebar contro
 
 All data is managed through a REST API (`POST /api/sites`, `PUT /api/sites/:id`, `DELETE /api/sites/:id`).
 
-#### 📍 Civilian
+#### Civilian
 
 The civilian dashboard is a read-only view designed for citizens passing through areas with active development.
 
@@ -104,9 +104,9 @@ The civilian dashboard is a read-only view designed for citizens passing through
 
 ---
 
-## 🔲 How Geo-Fencing Works
+## How Geo-Fencing Works
 
-This is the core mechanism of the application. Here's exactly how it's implemented:
+This is the core mechanism of the application. Here is exactly how it is implemented:
 
 ### Step 1 — Admin Defines Geo-Fence Zones
 
@@ -132,8 +132,8 @@ This data is stored on the server as a simple object:
 On the map, each site is visualized as:
 - A **colored dot marker** at the center point
 - A **dashed circle** showing the geo-fence boundary (radius in meters)
-  - 🟡 Yellow/dashed = In Progress
-  - 🟢 Green/solid = Completed
+  - Yellow/dashed = In Progress
+  - Green/solid = Completed
 
 ### Step 2 — Civilian's Location Is Tracked
 
@@ -157,8 +157,8 @@ Key points:
 Every time the user's position updates, the app calculates the distance between the user and **every** development site using the **Haversine formula**:
 
 ```
-a = sin²(Δlat/2) + cos(lat₁) · cos(lat₂) · sin²(Δlng/2)
-distance = 2 · R · atan2(√a, √(1−a))
+a = sin²(Δlat/2) + cos(lat1) * cos(lat2) * sin²(Δlng/2)
+distance = 2 * R * atan2(sqrt(a), sqrt(1-a))
 ```
 
 Where `R = 6,371,000 meters` (Earth's radius).
@@ -172,12 +172,12 @@ The check itself is straightforward:
 ```
 Is the user inside the geo-fence?
 
-→ distance(user, site) ≤ site.radius
+  distance(user, site) <= site.radius
 ```
 
-If **yes** → the user has **entered the geo-fence**.
+If **yes**, the user has **entered the geo-fence**.
 
-The app also implements **hysteresis** to avoid notification spam: once a notification fires for a site, it won't fire again until the user has moved **outside the radius by 10%** (i.e., `distance > radius × 1.1`), and then re-enters.
+The app also implements **hysteresis** to avoid notification spam: once a notification fires for a site, it won't fire again until the user has moved **outside the radius by 10%** (i.e., `distance > radius * 1.1`), and then re-enters.
 
 ### Step 5 — Notification Delivery
 
@@ -185,34 +185,34 @@ When a user enters a geo-fence, two things happen simultaneously:
 
 1. **Browser Notification** (system-level):
    ```javascript
-   new Notification("📍 City Hospital Wing B", {
-     body: "Hospital · In Progress\nNew wing with 200 beds..."
+   new Notification("City Hospital Wing B", {
+     body: "Hospital - In Progress\nNew wing with 200 beds..."
    });
    ```
    This appears as an OS-level notification even if the browser tab is not in focus.
 
-2. **In-app alert**: The sidebar highlights the site with a green "🟢 Inside geo-fence" indicator and shows the project details.
+2. **In-app alert**: The sidebar highlights the site with a green "Inside geo-fence" indicator and shows the project details.
 
 ### Continuous Monitoring
 
-The system re-checks proximity on every location update. Additionally, the civilian dashboard **polls the server every 15 seconds** for new/updated sites, so if an admin adds a new project while a civilian is nearby, they'll be notified within seconds.
+The system re-checks proximity on every location update. Additionally, the civilian dashboard **polls the server every 15 seconds** for new/updated sites, so if an admin adds a new project while a civilian is nearby, they will be notified within seconds.
 
 ```
-┌─────────────┐   watchPosition    ┌──────────────┐    ≤ radius?    ┌──────────────┐
-│ GPS / Wi-Fi │ ─────────────────► │  Haversine   │ ─────────────► │  Browser     │
-│ Location    │   (continuous)     │  Distance    │   YES          │  Notification│
-│             │                    │  Calculator  │                │  + In-app UI │
-└─────────────┘                    └──────────────┘                └──────────────┘
-                                         ▲
-                                         │ GET /api/sites (every 15s)
-                                   ┌─────┴────────┐
-                                   │  Express API  │
-                                   └──────────────┘
++---------------+   watchPosition    +----------------+    <= radius?    +----------------+
+| GPS / Wi-Fi   | -----------------> |  Haversine     | ---------------> |  Browser       |
+| Location      |   (continuous)     |  Distance      |   YES            |  Notification  |
+|               |                    |  Calculator    |                  |  + In-app UI   |
++---------------+                    +----------------+                  +----------------+
+                                           ^
+                                           | GET /api/sites (every 15s)
+                                     +-----+--------+
+                                     |  Express API  |
+                                     +--------------+
 ```
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 axiom/
@@ -232,7 +232,7 @@ axiom/
 
 ---
 
-## ⚙️ API Reference
+## API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -257,7 +257,7 @@ axiom/
 
 ---
 
-## 🔧 Technical Notes
+## Technical Notes
 
 - **Storage**: In-memory (JavaScript array). Data resets on server restart. For production, wire up a database (MongoDB, PostgreSQL, etc.)
 - **Authentication**: Stub only (role selection). For production, add proper auth (JWT, OAuth, etc.)
@@ -267,6 +267,6 @@ axiom/
 
 ---
 
-## 📜 License
+## License
 
 MIT
