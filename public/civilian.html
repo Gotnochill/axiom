@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Axiom Civilian View — View nearby public development projects and receive proximity alerts.">
+  <title>Nearby Projects — Axiom</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◎</text></svg>">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <span class="brand-name">◎ Axiom</span>
+        </div>
+        <span class="role-badge civilian">Civilian</span>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Location Status -->
+        <div class="location-status" id="location-status">
+          <div class="location-dot" id="location-dot"></div>
+          <span id="location-text">Requesting location access...</span>
+        </div>
+
+        <div class="section-title">Nearby Projects</div>
+        <div id="notification-list" class="notification-list">
+          <div class="empty-state" id="empty-state">
+            <span>🔔</span>
+            <p>Getting your location to find nearby projects...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="/">← Back to Home</a>
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/civilian.js"></script>
+</body>
+</html>
